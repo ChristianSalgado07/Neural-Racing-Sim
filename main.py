@@ -77,7 +77,7 @@ def main():
         gen_text = font.render(f"Generation: {generation}", True, (255, 255, 255))
         alive_text = font.render(f"Alive: {alive_count} / {TOTAL_CARS}", True, (0, 255, 100))
         score_text = font.render(f"Best Score: {int(best_distance)}", True, (255, 200, 0))
-        time_text = font.render(f"Time: {current_frame / max_frames}", True, (200, 200, 255))
+        time_text = font.render(f"Time: {(current_frame / max_frames) * 100:.2f}%", True, (200, 200, 255))   
         
         screen.blit(gen_text, (20, 20))
         screen.blit(alive_text, (20, 50))

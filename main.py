@@ -7,6 +7,26 @@ WIDTH, HEIGHT = 1200, 800
 FPS = 60
 TOTAL_CARS = 50
 
+# Puntos del circuito
+TRACK_POINTS = [
+    (91, 167), (328, 159),
+    (519, 240), (653, 155),
+    (764, 165), (814, 186),
+    (852, 235), (852, 265),
+    (845, 304), (800, 333),
+    (755, 348), (708, 367),
+    (711, 411), (719, 458),
+    (732, 485), (799, 526),
+    (843, 549), (905, 563),
+    (970, 599), (967, 632),
+    (898, 729), (750, 729),
+    (195, 711), (177, 564),
+    (208, 512), (256, 486),
+    (271, 443), (261, 396),
+    (205, 365), (96, 316),
+    (86, 174),
+]
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -15,7 +35,7 @@ def main():
     
     font = pygame.font.SysFont("Courier", 24, bold=True)
     
-    start_x, start_y = 160, HEIGHT // 2
+    start_x, start_y = 91, 167
     
     cars = [Car(start_x, start_y) for _ in range(TOTAL_CARS)]
     
@@ -33,14 +53,20 @@ def main():
         screen.fill((15, 15, 25)) # Fondo azul oscuro
         
         TRACK_COLOR = (30, 30, 40) # Pista, color asfalto oscuro
-        pygame.draw.ellipse(screen, TRACK_COLOR, (100, 100, WIDTH-200, HEIGHT-200), 120)
+        
+        # Dibujar las líneas gruesas conectando los puntos
+        pygame.draw.lines(screen, TRACK_COLOR, True, TRACK_POINTS, 120)
+        
+        # Dibujar círculos en cada punto para que las curvas sean redondas
+        for p in TRACK_POINTS:
+            pygame.draw.circle(screen, TRACK_COLOR, p, 60) # El radio es la mitad del grosor (60)
 
         # Lógica y evolución
         alive_count = 0
         best_distance = 0
 
         for car in cars:
-            car.update(screen)
+            car.update(screen, TRACK_POINTS)
             if car.alive:
                 alive_count += 1
             if car.distance > best_distance:

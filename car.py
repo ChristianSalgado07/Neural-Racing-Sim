@@ -6,12 +6,14 @@ class Car:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.angle = math.pi / 2  # Apuntando hacia arriba para seguir la pista
+        self.angle = 0  # Apuntando hacia arriba para seguir la pista
         self.speed = 0
         self.alive = True
         self.distance = 0
         self.brain = NeuralCar()
         self.sensor_lines = [] # Para guardar y dibujar los rayos visuales
+        self.current_checkpoint = 1  # Empieza buscando el segundo punto de la pista
+        self.checkpoints_passed = 0  # Cuenta cuántos puntos ha tocado en total
         
     def get_sensors(self, screen):
         sensors = []
@@ -49,7 +51,7 @@ class Car:
             
         return sensors            
         
-    def update(self, screen):
+    def update(self, screen, track_points):
         if not self.alive:
             return
         
@@ -71,12 +73,27 @@ class Car:
         self.speed += gas * 0.5      
         self.speed = max(1, min(self.speed, 6)) # Limitar la velocidad
         
-        # 3. Mover carro
+        # Mover carro
         self.x += math.cos(self.angle) * self.speed
         self.y -= math.sin(self.angle) * self.speed
         
-        self.distance += self.speed # Sumar puntos por avanzar
+        target_x, target_y = track_points[self.current_checkpoint]
         
+        # Teorema de Pitágoras para saber la distancia exacta al siguiente punto
+        dist_to_target = math.hypot(target_x - self.x, target_y - self.y)
+        
+        # Si el carro toca el checkpoint
+        if dist_to_target < 80:
+            self.current_checkpoint += 1
+            self.checkpoints_passed += 1
+            
+            # Si llegó al final del arreglo, le da la vuelta al circuito y vuelve a buscar el 0
+            if self.current_checkpoint >= len(track_points):
+                self.current_checkpoint = 0
+                
+        # Ganan 1000 puntos por cada checkpoint que pasen y se premian por dar cada paso en la dirección correcta.
+        self.distance = (self.checkpoints_passed * 1000) + (1000 - dist_to_target)
+                
     def draw(self, screen):
         # Dibujar rayos de los sensores
         if self.alive:
